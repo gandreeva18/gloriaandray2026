@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gloria & Ray - We're Getting Married!</title>
+    <style>
+        /* Updated Google Fonts: Bodoni Moda (Variable with Italics) and Tenor Sans */
+        @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Tenor+Sans&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Tenor Sans', sans-serif;
+            color: #333;
+            background-color: #fff;
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* Split Screen Layout - Fullscreen */
+        .container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            background: #fff;
+            overflow: hidden;
+            position: relative; /* Base for the fullscreen particle canvas */
+        }
+
+        .left-photo {
+            flex: 2;
+            background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .left-photo::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.15);
+        }
+
+        .photo-text {
+            position: absolute;
+            bottom: 50px;
+            left: 50px;
+            color: white;
+            text-shadow: 1px 1px 12px rgba(0,0,0,0.6);
+            z-index: 5; /* Above particles */
+        }
+
+        .photo-text h2 {
+            font-family: 'Bodoni Moda', serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 500;
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+
+        /* Styling for the ampersand in the photo area */
+        .photo-text h2 span.amp {
+            font-style: italic;
+            font-family: 'Bodoni Moda', serif;
+            margin: 0 5px;
+            font-weight: 400;
+        }
+
+        .photo-text p {
+            font-size: 1.3rem;
+            margin-top: 10px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .right-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            background-color: #f8f8f8;
+            position: relative;
+            z-index: 5; /* Above particles */
+            min-height: 100vh;
+        }
+
+        /* Particle Canvas Styling - Now Fullscreen Overlay */
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2; /* Over background, under text */
+        }
+
+        .leaf-graphic {
+            font-size: 2.2rem;
+            color: #7793c2; 
+            margin: 10px 0;
+            opacity: 0.7;
+            user-select: none;
+        }
+
+        /* Glassmorphism Info Box */
+        .info-box {
+            background: rgba(255, 255, 255, 0.5); 
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(119, 147, 194, 0.1);
+            border-radius: 12px;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 320px;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .save-the-date {
+            font-family: 'Bodoni Moda', serif;
+            font-size: 0.9rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: #7793c2;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .names-subtitle {
+            font-family: 'Bodoni Moda', serif;
+            font-size: 2.2rem;
+            color: #222;
+            letter-spacing: 1px;
+            margin-top: -5px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        /* Specifically styling the ampersand for the long, elegant look */
+        .amp {
+            font-family: 'Bodoni Moda', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 1.1em;
+            margin: 0 2px;
+        }
+
+        .date-text {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #7793c2;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-top: 15px;
+            width: 80%;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .location-text {
+            font-family: 'Bodoni Moda', serif;
+            font-size: 1.1rem;
+            letter-spacing: 4px;
+            color: #555;
+            line-height: 1.4;
+            width: 80%;
+        }
+
+        .countdown {
+            font-size: 0.8rem;
+            color: #777;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border: 1px solid rgba(0,0,0,0.05);
+            padding: 8px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            display: inline-block;
+        }
+
+        #rsvpTrigger {
+            background-color: transparent;
+            border: 1.5px solid #7793c2;
+            color: #7793c2;
+            padding: 10px 30px;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: 'Tenor Sans', sans-serif;
+        }
+
+        #rsvpTrigger:hover {
+            background-color: #7793c2;
+            color: white;
+            box-shadow: 0 4px 12px rgba(119, 147, 194, 0.15);
+        }
+
+        .rsvp-section {
+            width: 100%;
+            max-width: 280px;
+            padding-top: 15px;
+            display: none; 
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+        }
+
+        .rsvp-section.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .rsvp-section h3 {
+            font-family: 'Bodoni Moda', serif;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 400;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            font-family: 'Tenor Sans', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            background-color: #fff;
+        }
+
+        input:focus, select:focus {
+            border-color: #7793c2;
+        }
+
+        #submitBtn {
+            width: 100%;
+            padding: 12px;
+            background-color: #7793c2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Tenor Sans', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 400;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        #submitBtn:hover {
+            background-color: #5d77a3;
+        }
+
+        #addGuestBtn {
+            width: 100%;
+            background: none;
+            border: 1px dashed #7793c2;
+            color: #7793c2;
+            padding: 8px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            display: none;
+            opacity: 0;
+            font-family: 'Tenor Sans', sans-serif;
+        }
+
+        #addGuestBtn:hover {
+            background-color: #f0f4fa;
+            border-style: solid;
+        }
+
+        #addGuestBtn.added {
+            background-color: #7793c2;
+            color: white;
+            border-style: solid;
+            cursor: default;
+        }
+
+        #addGuestBtn.visible {
+            display: block;
+            opacity: 1;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .additional-guest-input {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        #rsvpMessage {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            line-height: 1.4;
+            display: none;
+            text-align: center;
+        }
+
+        .success-msg { 
+            background-color: #f0f4fa;
+            color: #455a7a;
+            border: 1px solid #d1dde6; 
+            box-shadow: 0 2px 8px rgba(119, 147, 194, 0.1);
+        }
+        .error-msg { background-color: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .left-photo { min-height: 50vh; }
+            .photo-text { bottom: 30px; left: 30px; }
+            .right-content { padding: 40px 20px; min-height: auto; flex: 1; }
+            .rsvp-section { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Floating Particle Canvas (Now Covers Everything) -->
+        <canvas id="particleCanvas"></canvas>
+
+        <!-- Photo Side (2/3) -->
+        <div class="left-photo">
+            <div class="photo-text">
+                <h2>Gloria <span class="amp">&</span> Ray</h2>
+                <p>We're getting married!</p>
+            </div>
+        </div>
+        
+        <!-- Info & RSVP Side (1/3) -->
+        <div class="right-content">
+            <div class="leaf-graphic">🌿</div>
+            
+            <div class="info-box">
+                <div class="save-the-date">SAVE THE DATE</div>
+                
+                <div class="names-subtitle">Gloria <span class="amp">&</span> Ray</div>
+
+                <div class="date-text">August 2, 2026</div>
+                <div class="location-text">Sofia, Bulgaria</div>
+                
+                <div class="countdown" id="countdownTimer">Loading countdown...</div>
+                
+                <button id="rsvpTrigger">RSVP</button>
+            </div>
+
+            <div class="rsvp-section" id="rsvpContainer">
+                <h3>RSVP</h3>
+                <form id="rsvpForm">
+                    <div class="form-group">
+                        <input type="text" id="guestName" name="guestName" placeholder="First & Last Name" required>
+                    </div>
+                    <div class="form-group">
+                        <select id="attendance" name="attendance" required>
+                            <option value="" disabled selected>Will you attend?</option>
+                            <option value="Joyfully Accepts">Joyfully Accepts</option>
+                            <option value="Regretfully Declines">Regretfully Declines</option>
+                        </select>
+                    </div>
+
+                    <div id="additionalGuestsContainer"></div>
+                    <button type="button" id="addGuestBtn">Add + One Additional Guest</button>
+                    <button type="submit" id="submitBtn">Send RSVP</button>
+                </form>
+                <div id="rsvpMessage"></div>
+            </div>
+            
+            <div class="leaf-graphic" style="transform: scaleX(-1);">🌿</div>
+        </div>
+    </div>
+
+    <script>
+        // Wedding Countdown
+        const weddingDate = new Date("August 2, 2026 17:00:00").getTime();
+        
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = weddingDate - now;
+            if (distance < 0) {
+                document.getElementById("countdownTimer").innerHTML = "The Big Day is Here!";
+                return;
+            }
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            
+            document.getElementById("countdownTimer").innerHTML = `${days} Days &nbsp; ${hours} Hrs &nbsp; ${minutes} Min`;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // RSVP Form Interactions
+        const rsvpTrigger = document.getElementById('rsvpTrigger');
+        const rsvpContainer = document.getElementById('rsvpContainer');
+        const guestNameInput = document.getElementById('guestName');
+        const attendanceSelect = document.getElementById('attendance');
+        const addGuestBtn = document.getElementById('addGuestBtn');
+        const additionalGuestsContainer = document.getElementById('additionalGuestsContainer');
+
+        rsvpTrigger.addEventListener('click', () => {
+            rsvpTrigger.style.display = 'none';
+            rsvpContainer.style.display = 'block';
+            setTimeout(() => {
+                rsvpContainer.classList.add('show');
+            }, 10);
+        });
+
+        function checkGuestButtonVisibility() {
+            const isJoyfullyAccepts = attendanceSelect.value === 'Joyfully Accepts';
+            const isTyping = guestNameInput.value.trim().length > 0;
+            const guestAlreadyAdded = additionalGuestsContainer.children.length > 0;
+
+            if (isJoyfullyAccepts && isTyping && !guestAlreadyAdded) {
+                addGuestBtn.classList.add('visible');
+            } else if (guestAlreadyAdded) {
+                addGuestBtn.classList.add('visible');
+            } else {
+                addGuestBtn.classList.remove('visible');
+            }
+        }
+
+        guestNameInput.addEventListener('input', checkGuestButtonVisibility);
+        attendanceSelect.addEventListener('change', checkGuestButtonVisibility);
+
+        addGuestBtn.addEventListener('click', () => {
+            if (additionalGuestsContainer.children.length > 0) return;
+
+            addGuestBtn.classList.add('added');
+            addGuestBtn.textContent = "Guest Added";
+
+            const group = document.createElement('div');
+            group.className = 'form-group additional-guest-input';
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'additionalGuestName';
+            input.placeholder = "Plus One's Full Name";
+            input.required = true;
+            
+            group.appendChild(input);
+            additionalGuestsContainer.appendChild(group);
+            
+            input.focus();
+        });
+
+        // Form Submission Logic
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxo93J-L7bTA4jPnaoIUC76GsW_B7KmkyPVN-5HNZwLfBsyEvdh7LlZzAT_fiQhDRaz/exec'; 
+
+        const form = document.getElementById('rsvpForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const rsvpMessage = document.getElementById('rsvpMessage');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            
+            const responseValue = attendanceSelect.value;
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Sending...";
+
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            for (const pair of formData.entries()) {
+                params.append(pair[0], pair[1]);
+            }
+            
+            fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: params 
+            })
+            .then(() => {
+                let successMsg = "RSVP successfully sent!<br>See you in Sofia!";
+                if (responseValue === "Regretfully Declines") {
+                    successMsg = "RSVP successfully sent!<br>Thank you for replying to our invite!";
+                }
+
+                showMessage(successMsg, "success");
+                form.reset();
+                additionalGuestsContainer.innerHTML = ''; 
+                addGuestBtn.classList.remove('visible', 'added');
+                addGuestBtn.textContent = "Add + One Additional Guest";
+            })
+            .catch(error => {
+                showMessage("Network error. Please try again.", "error");
+                console.error('Error!', error.message);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Send RSVP";
+            });
+        });
+
+        function showMessage(text, type) {
+            rsvpMessage.innerHTML = text;
+            rsvpMessage.className = type === "success" ? "success-msg" : "error-msg";
+            rsvpMessage.style.display = 'block';
+        }
+
+        // Particle Animation Logic
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const particleCount = 60; // Slightly more particles for the larger area
+
+        class Particle {
+            constructor() {
+                this.init();
+            }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 2 + 1; // Slightly smaller for refinement
+                this.speed = Math.random() * 0.4 + 0.1;
+                this.opacity = Math.random() * 0.15 + 0.05; // Increased translucency
+            }
+            update() {
+                this.y -= this.speed;
+                if (this.y < -10) {
+                    this.init();
+                }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`; // White dots
+                ctx.fill();
+            }
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles();
+        });
+
+        // Initialize animation on load
+        window.onload = function() {
+            resizeCanvas();
+            initParticles();
+            animate();
+        };
+    </script>
+</body>
+</html>
