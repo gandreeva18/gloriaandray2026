@@ -20,6 +20,8 @@
             background-color: #fff;
             display: flex;
             min-height: 100vh;
+            /* Use dynamic viewport height for mobile browsers to account for address bars */
+            min-height: 100dvh; 
             width: 100%;
             overflow-x: hidden;
         }
@@ -29,8 +31,9 @@
             display: flex;
             width: 100%;
             min-height: 100vh;
+            min-height: 100dvh;
             background: #fff;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
         }
 
@@ -196,8 +199,8 @@
             background-color: transparent;
             border: 1.5px solid #7793c2;
             color: #7793c2;
-            padding: 10px 30px;
-            font-size: 0.9rem;
+            padding: 12px 30px;
+            font-size: 0.95rem;
             letter-spacing: 3px;
             font-weight: 400;
             cursor: pointer;
@@ -206,6 +209,7 @@
             border-radius: 4px;
             margin-top: 10px;
             font-family: 'Tenor Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         #rsvpTrigger:hover {
@@ -215,7 +219,7 @@
 
         .rsvp-section {
             width: 100%;
-            max-width: 280px;
+            max-width: 320px;
             padding-top: 15px;
             display: none; 
             opacity: 0;
@@ -232,7 +236,7 @@
         .rsvp-section h3 {
             font-family: 'Bodoni Moda', serif;
             font-size: 1.8rem;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-weight: 400;
             color: #444;
             text-transform: uppercase;
@@ -240,19 +244,20 @@
         }
 
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             text-align: left;
         }
 
         input, select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #e8e8e8;
             border-radius: 4px;
             font-family: 'Tenor Sans', sans-serif;
-            font-size: 0.9rem;
+            font-size: 1rem; /* Better for mobile to prevent auto-zoom on iOS */
             outline: none;
             background-color: #fff;
+            appearance: none;
         }
 
         input:focus, select:focus {
@@ -262,7 +267,7 @@
         /* Submit Button logic */
         #submitBtn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background-color: transparent;
             color: #7793c2;
             border: 1.5px solid #7793c2;
@@ -272,8 +277,9 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: 400;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
         #submitBtn:hover {
@@ -291,8 +297,8 @@
             background: none;
             border: 1px dashed #7793c2;
             color: #7793c2;
-            padding: 8px;
-            font-size: 0.8rem;
+            padding: 10px;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
@@ -300,6 +306,7 @@
             border-radius: 4px;
             display: none;
             font-family: 'Tenor Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         #addGuestBtn.visible {
@@ -309,10 +316,10 @@
 
         #rsvpMessage {
             margin-top: 15px;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
-            font-size: 1rem;
-            line-height: 1.4;
+            font-size: 1.05rem;
+            line-height: 1.5;
             display: none;
             text-align: center;
         }
@@ -326,14 +333,15 @@
         .website-link {
             display: inline-block;
             margin-top: 15px;
-            padding: 10px 20px;
+            padding: 12px 24px;
             background-color: #7793c2;
             color: white;
             text-decoration: none;
             border-radius: 4px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 2px;
+            -webkit-tap-highlight-color: transparent;
         }
 
         @keyframes fadeIn {
@@ -341,10 +349,72 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* --- Mobile Specific Optimization --- */
         @media (max-width: 768px) {
-            .container { flex-direction: column; }
-            .left-photo { min-height: 50vh; }
-            .right-content { padding: 40px 20px; }
+            .container { 
+                flex-direction: column; 
+            }
+            
+            .left-photo { 
+                flex: none;
+                height: 45vh; /* Fixed height for photo on mobile */
+                width: 100%;
+            }
+
+            .photo-text {
+                bottom: 30px;
+                left: 20px;
+                right: 20px;
+            }
+
+            .photo-text h2 {
+                font-size: clamp(2.2rem, 10vw, 3rem);
+            }
+
+            .photo-text p {
+                font-size: 1.1rem;
+                letter-spacing: 2px;
+            }
+
+            .right-content { 
+                flex: none;
+                padding: 40px 20px 60px 20px;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .names-subtitle {
+                font-size: 1.8rem;
+            }
+
+            .info-box {
+                padding: 25px 15px;
+                max-width: 100%; /* Take full width on small mobile */
+            }
+
+            .countdown {
+                font-size: 0.75rem;
+                padding: 6px 10px;
+                line-height: 1.4;
+            }
+
+            .rsvp-section {
+                max-width: 100%;
+            }
+
+            .leaf-graphic {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Very small screen adjustments */
+        @media (max-width: 380px) {
+            .photo-text h2 {
+                font-size: 2rem;
+            }
+            .names-subtitle {
+                font-size: 1.6rem;
+            }
         }
     </style>
 </head>
@@ -425,6 +495,13 @@
             rsvpTrigger.style.display = 'none';
             rsvpContainer.style.display = 'block';
             setTimeout(() => rsvpContainer.classList.add('show'), 10);
+            
+            // Scroll to form on mobile for better UX
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    rsvpContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
         });
 
         attendanceSelect.addEventListener('change', () => {
@@ -471,6 +548,9 @@
                 rsvpMessage.style.display = 'block';
                 form.style.display = 'none';
                 document.querySelector('.rsvp-section h3').style.display = 'none';
+                
+                // Ensure success message is visible
+                rsvpMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 1500);
         });
 
@@ -504,6 +584,13 @@
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            // Re-init particles on resize to avoid gaps
+            initParticles();
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) particles.push(new Particle());
         }
 
         function animate() {
@@ -514,7 +601,6 @@
 
         window.onload = () => {
             resizeCanvas();
-            for (let i = 0; i < particleCount; i++) particles.push(new Particle());
             animate();
         };
         window.onresize = resizeCanvas;
