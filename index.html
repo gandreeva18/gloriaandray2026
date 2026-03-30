@@ -20,13 +20,11 @@
             background-color: #fff;
             display: flex;
             min-height: 100vh;
-            /* Use dynamic viewport height for mobile browsers to account for address bars */
             min-height: 100dvh; 
             width: 100%;
             overflow-x: hidden;
         }
 
-        /* Split Screen Layout */
         .container {
             display: flex;
             width: 100%;
@@ -37,20 +35,39 @@
             position: relative;
         }
 
+        /* --- Slideshow Container --- */
         .left-photo {
             flex: 2;
-            background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
-            background-size: cover;
-            background-position: center;
             position: relative;
             min-height: 100vh;
+            overflow: hidden;
+            background-color: #eee;
         }
 
-        .left-photo::before {
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        /* Subtle overlay to ensure text contrast */
+        .left-photo::after {
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.15);
+            background: rgba(0,0,0,0.2);
+            z-index: 2;
         }
 
         .photo-text {
@@ -83,6 +100,24 @@
             font-weight: 300;
             letter-spacing: 3px;
             text-transform: uppercase;
+        }
+
+        .mobile-rsvp-overlay {
+            display: none;
+            margin-top: 25px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #7793c2;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-radius: 4px;
+            font-family: 'Tenor Sans', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            -webkit-tap-highlight-color: transparent;
         }
 
         .right-content {
@@ -118,7 +153,7 @@
             user-select: none;
         }
 
-        /* Info Box Styling */
+        /* Glassmorphism Info Box */
         .info-box {
             background: rgba(255, 255, 255, 0.5); 
             backdrop-filter: blur(8px);
@@ -199,7 +234,7 @@
             background-color: transparent;
             border: 1.5px solid #7793c2;
             color: #7793c2;
-            padding: 12px 30px;
+            padding: 10px 30px;
             font-size: 0.95rem;
             letter-spacing: 3px;
             font-weight: 400;
@@ -254,7 +289,7 @@
             border: 1px solid #e8e8e8;
             border-radius: 4px;
             font-family: 'Tenor Sans', sans-serif;
-            font-size: 1rem; /* Better for mobile to prevent auto-zoom on iOS */
+            font-size: 1rem; 
             outline: none;
             background-color: #fff;
             appearance: none;
@@ -264,7 +299,7 @@
             border-color: #7793c2;
         }
 
-        /* Submit Button logic */
+        /* Submit Button with Transition Logic */
         #submitBtn {
             width: 100%;
             padding: 14px;
@@ -357,23 +392,20 @@
             
             .left-photo { 
                 flex: none;
-                height: 45vh; /* Fixed height for photo on mobile */
+                height: 55vh; 
                 width: 100%;
             }
 
             .photo-text {
-                bottom: 30px;
-                left: 20px;
-                right: 20px;
+                bottom: 40px;
+                left: 0;
+                right: 0;
+                text-align: center; 
+                padding: 0 20px;
             }
 
-            .photo-text h2 {
-                font-size: clamp(2.2rem, 10vw, 3rem);
-            }
-
-            .photo-text p {
-                font-size: 1.1rem;
-                letter-spacing: 2px;
+            .mobile-rsvp-overlay {
+                display: inline-block; 
             }
 
             .right-content { 
@@ -383,37 +415,12 @@
                 min-height: auto;
             }
 
-            .names-subtitle {
-                font-size: 1.8rem;
-            }
-
             .info-box {
-                padding: 25px 15px;
-                max-width: 100%; /* Take full width on small mobile */
-            }
-
-            .countdown {
-                font-size: 0.75rem;
-                padding: 6px 10px;
-                line-height: 1.4;
+                max-width: 100%;
             }
 
             .rsvp-section {
                 max-width: 100%;
-            }
-
-            .leaf-graphic {
-                font-size: 1.8rem;
-            }
-        }
-
-        /* Very small screen adjustments */
-        @media (max-width: 380px) {
-            .photo-text h2 {
-                font-size: 2rem;
-            }
-            .names-subtitle {
-                font-size: 1.6rem;
             }
         }
     </style>
@@ -421,12 +428,22 @@
 <body>
 
     <div class="container">
+        <!-- Floating white dots over everything -->
         <canvas id="particleCanvas"></canvas>
 
-        <div class="left-photo">
+        <div class="left-photo" id="slideshow">
+            <!-- Photos provided in the order requested -->
+            <div class="slide active" style="background-image: url('1774840367331.png')"></div>
+            <div class="slide" style="background-image: url('20250520_190431.jpg')"></div>
+            <div class="slide" style="background-image: url('20240406_152351.jpg')"></div>
+            <div class="slide" style="background-image: url('20230724_131826.jpg')"></div>
+            <div class="slide" style="background-image: url('20250501_144135.jpg')"></div>
+            
             <div class="photo-text">
                 <h2>Gloria <span class="amp">&</span> Ray</h2>
                 <p>We're getting married!</p>
+                <!-- Mobile Only Trigger -->
+                <button id="mobileRsvpTrigger" class="mobile-rsvp-overlay">RSVP</button>
             </div>
         </div>
         
@@ -443,7 +460,7 @@
             </div>
 
             <div class="rsvp-section" id="rsvpContainer">
-                <h3>RSVP</h3>
+                <h3 id="formTop">RSVP</h3>
                 <form id="rsvpForm">
                     <div class="form-group">
                         <input type="text" id="guestName" name="guestName" placeholder="First & Last Name" required>
@@ -467,7 +484,18 @@
     </div>
 
     <script>
-        // Countdown Logic (Target: 17:00)
+        // Slideshow Logic
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+        setInterval(nextSlide, 5000); 
+
+        // Wedding Countdown (August 2, 2026 at 17:00)
         const weddingDate = new Date("August 2, 2026 17:00:00").getTime();
         function updateCountdown() {
             const now = new Date().getTime();
@@ -484,25 +512,29 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // UI Interactions
+        // RSVP UI Logic
         const rsvpTrigger = document.getElementById('rsvpTrigger');
+        const mobileRsvpTrigger = document.getElementById('mobileRsvpTrigger');
         const rsvpContainer = document.getElementById('rsvpContainer');
         const attendanceSelect = document.getElementById('attendance');
         const addGuestBtn = document.getElementById('addGuestBtn');
         const additionalGuestsContainer = document.getElementById('additionalGuestsContainer');
 
-        rsvpTrigger.addEventListener('click', () => {
+        function openRsvpForm() {
             rsvpTrigger.style.display = 'none';
+            mobileRsvpTrigger.style.visibility = 'hidden'; 
             rsvpContainer.style.display = 'block';
             setTimeout(() => rsvpContainer.classList.add('show'), 10);
             
-            // Scroll to form on mobile for better UX
-            if (window.innerWidth <= 768) {
-                setTimeout(() => {
-                    rsvpContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 100);
-            }
-        });
+            // Scroll to form smoothly for mobile
+            setTimeout(() => {
+                const target = document.getElementById('formTop');
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        rsvpTrigger.addEventListener('click', openRsvpForm);
+        mobileRsvpTrigger.addEventListener('click', openRsvpForm);
 
         attendanceSelect.addEventListener('change', () => {
             if (attendanceSelect.value === 'Joyfully Accepts') {
@@ -523,7 +555,7 @@
             }
         });
 
-        // Form Submission
+        // Form Submission logic
         const form = document.getElementById('rsvpForm');
         const submitBtn = document.getElementById('submitBtn');
         const rsvpMessage = document.getElementById('rsvpMessage');
@@ -540,6 +572,7 @@
 
                 let msg = "RSVP successfully sent!<br>See you in Sofia!";
                 if (attendanceSelect.value === 'Joyfully Accepts') {
+                    // This button links to the second page
                     msg += `<br><a href="wedding_details.html" class="website-link">Our Wedding Website</a>`;
                 }
                 
@@ -549,12 +582,11 @@
                 form.style.display = 'none';
                 document.querySelector('.rsvp-section h3').style.display = 'none';
                 
-                // Ensure success message is visible
                 rsvpMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 1500);
         });
 
-        // Particle Animation (White dots, translucent)
+        // Particle Animation (White translucent dots)
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -584,7 +616,6 @@
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            // Re-init particles on resize to avoid gaps
             initParticles();
         }
 
@@ -607,3 +638,4 @@
     </script>
 </body>
 </html>
+
